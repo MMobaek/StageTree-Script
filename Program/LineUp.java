@@ -15,13 +15,18 @@ public class LineUp {
         saveList(); // Auto-save
     }
 
-    public void removeSubmission(Contestant contestant) {
-        stagePool.remove(contestant);
-        saveList(); // Auto-save
+    public void removeSubmission(String name) {
+        for (int i = 0; i < stagePool.size(); i++) {
+            if (stagePool.get(i).name.equals(name)) {
+                stagePool.remove(i);
+                saveList(); // Auto-save
+            }
+        }
     }
 
     // Thanks to Gemini for making saving functionality
     public void saveList() {
+        duplicantRemover();
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(FILENAME))) {
             oos.writeObject(stagePool);
             System.out.println("Data saved successfully to " + FILENAME);
@@ -46,6 +51,12 @@ public class LineUp {
             return new ArrayList<>();
         }
     }
+
+    private void duplicantRemover() {
+        java.util.LinkedHashSet<Contestant> set = new java.util.LinkedHashSet<>(stagePool);
+        stagePool = new ArrayList<>(set);
+    }
+
 
     // debug
     public void Writer() {
