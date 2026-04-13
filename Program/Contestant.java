@@ -32,6 +32,7 @@ public class Contestant implements Serializable{
         this.importance = -1;
     }
 
+    @Override
     public String toString() {
 
         if (name.equals("lacking")) {

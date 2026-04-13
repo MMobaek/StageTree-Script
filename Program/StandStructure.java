@@ -17,8 +17,9 @@ public class StandStructure {
     private int currentTime;
     private int duration;
     private int beredingTime0;
-    private int startTime0;
+    public int startTime0;
     private int endTime0;
+    
 
 
     public StandStructure(int contestantCount, int pauseCount, int startHour, int startMinute, int endHour, int endMinute, int beredingHour, int beredingMinute) {
@@ -50,6 +51,16 @@ public class StandStructure {
     private int minutesToDateminute(int minutes) {
         return minutes % 60;
     }
+
+    public int[] timeStamps() {
+        int count = endTime0 / 15;
+        int[] times = new int[count];
+        for(int i = 0; i < count; i++) {
+            times[i] = 15 * i;
+        }
+        return times;
+    }
+
 
 
     // After creating an ArrayList of the participants create a 2x2 list
