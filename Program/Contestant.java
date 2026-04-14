@@ -41,7 +41,7 @@ public class Contestant implements Serializable{
         if (importance == -1) {
             return String.format("%s will perform a %s called %s. It lasts %d minutes. Importance is unknown", name, actCategory, act, duration);
         }
-        return String.format("%s will perform a %s called %s. It lasts %d minutes", name, actCategory, act, duration);
+        return String.format("%s will perform a %s called %s. It lasts %d minutes, importance = %d", name, actCategory, act, duration, importance);
     }
 
     @Override

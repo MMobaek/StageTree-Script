@@ -11,6 +11,7 @@ public class LineUp {
     }
 
     public void addSubmission(Contestant contestant) {
+        removeSubmission(contestant.name);
         stagePool.add(contestant);
         saveList(); // Auto-save
     }

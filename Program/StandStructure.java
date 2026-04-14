@@ -11,7 +11,7 @@ public class StandStructure {
     private int startMinute;
     private int endHour;
     private int endMinute;
-    private int startTime;
+    public int startTime;
     private int beredingTime;
     private int endTime;
     private int currentTime;
@@ -40,15 +40,15 @@ public class StandStructure {
         this.endTime0 = endTime - beredingTime;
     }
 
-    private int dateToMinutes(int hours, int minutes) {
+    public int dateToMinutes(int hours, int minutes) {
         return 60 * hours + minutes;
     }
 
-    private int minutesToDatehour(int minutes) {
+    public int minutesToDatehour(int minutes) {
         return minutes / 60;
     }
 
-    private int minutesToDateminute(int minutes) {
+    public int minutesToDateminute(int minutes) {
         return minutes % 60;
     }
 
