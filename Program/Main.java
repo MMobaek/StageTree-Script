@@ -9,6 +9,6 @@ public class Main {
 
         Script script = new Script(15, 4, 18, 30, 22, 15, 11, 30, submissions);
         submissions.Writer();
-        //System.out.println(script.toString());
+        System.out.println(script.toString());
     }
 }

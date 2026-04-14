@@ -53,10 +53,10 @@ public class StandStructure {
     }
 
     public int[] timeStamps() {
-        int count = endTime0 / 15;
+        int count = endTime0 / 5;
         int[] times = new int[count];
         for(int i = 0; i < count; i++) {
-            times[i] = 15 * i;
+            times[i] = 5 * i;
         }
         return times;
     }
@@ -64,17 +64,6 @@ public class StandStructure {
 
 
     // After creating an ArrayList of the participants create a 2x2 list
-
-
-
-
-
-
-
-
-
-
-
 
 
 
