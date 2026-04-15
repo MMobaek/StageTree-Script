@@ -38,7 +38,7 @@ public class Script {
             }
 
             if (foundPrep != null) {
-                int slotsNeeded = foundPrep.duration / 5 + 1;
+                int slotsNeeded = Math.ceilDiv(foundPrep.duration, 5);
                 for (int j = 0; j < slotsNeeded && slotIndex < script.length; j++) {
                     script[slotIndex] = foundPrep.toString();
                     slotIndex++;

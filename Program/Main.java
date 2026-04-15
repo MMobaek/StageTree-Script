@@ -33,11 +33,16 @@ public class Main {
         submissions.Writer();
         System.out.println(script.toString());
 
-        // ... setup your submissions and stand structure ...
-        Script myScript = new Script(15, 18, 30, 22, 15, 11, 30, submissions);;
+        
+        
+        // Define timing once
+        int contCount = 15, sH = 18, sM = 30, eH = 22, eM = 15, pH = 11, pM = 30;
+        int[] params = {contCount, sH, sM, eH, eM, pH, pM};
 
-        // Launch the UI
-        ScriptDisplay.showScript(myScript);
+        Script myScript = new Script(contCount, sH, sM, eH, eM, pH, pM, submissions);
+
+        // Launch the updated UI
+        ScriptDisplay.showScript(myScript, submissions, params);
 
     }
 }

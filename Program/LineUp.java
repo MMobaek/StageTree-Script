@@ -54,6 +54,16 @@ public class LineUp {
     }
 
     public void popPreparation(int index) {
+        Stageprep s;
+        for (int i = 0; i < stageprep.size(); i++) {
+            for (int j = 0; j < stageprep.size() - 1; j++) {
+                if (stageprep.get(j).time > stageprep.get(j+1).time) {
+                    s = stageprep.get(j);
+                    stageprep.set(j, stageprep.get(j+1));
+                    stageprep.set(j+1, s);
+                }
+            }
+        }
         stageprep.remove(index);
         saveList();
     }
