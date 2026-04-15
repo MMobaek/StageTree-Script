@@ -38,7 +38,6 @@ public class SongOrder {
             newer.add(submissions.stagePool.get(mid + i));
             newer.add(submissions.stagePool.get(i));
         }
-
         if (size % 2 != 0) {
             newer.add(submissions.stagePool.get(size - 1));
         }

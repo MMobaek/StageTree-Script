@@ -2,17 +2,24 @@ import java.util.ArrayList;
 
 public class Script {
     private StandStructure timing;
+    private SongOrder songOrder;
     public String[] script;
     private int[] timeStamps;
-    private SongOrder songOrder;
+    private int pauseCount;
     private int slotIndex;
+    private int pausesUsed;
+    private int pauseTime;
 
     
-    public Script(int contestantCount, int pauseCount, int starthour, int startMinute, int endHour, int endMinute, int beredingHour, int beredingMinute, LineUp submissions) {
+
+    
+    public Script(int contestantCount, int starthour, int startMinute, int endHour, int endMinute, int beredingHour, int beredingMinute, LineUp submissions) {
+        this.pauseCount = submissions.pauses.size();
         this.timing = new StandStructure(contestantCount, pauseCount, starthour, startMinute, endHour, endMinute, beredingHour, beredingMinute);
         this.timeStamps = timing.timeStamps();
         this.script = new String[timeStamps.length];
         this.songOrder = new SongOrder(submissions);
+        this.pausesUsed = 0;
         this.slotIndex = 0;
         addPreparation();
         addPerformances();
@@ -28,23 +35,55 @@ public class Script {
     }
 
     private void addPerformances() {
-        for (Contestant c : songOrder.submissions.stagePool) {
-            // Calculate slots: e.g., 5 mins / 5 = 1 slot. 
-            // Use Math.ceil if durations aren't perfectly divisible.
-            int slotsNeeded = c.duration / 5 + 1; 
+        int contestantIdx = 0;
+        ArrayList<Contestant> contestants = songOrder.submissions.stagePool;
 
-            for (int i = 0; i < slotsNeeded; i++) {
-                if (slotIndex < script.length) {
+        while (slotIndex < script.length) {
+            if (pausePlanner()) {
+                addPause();
+                continue;
+            }
+
+            if (contestantIdx < contestants.size()) {
+                Contestant c = contestants.get(contestantIdx);
+                int slotsNeeded = c.duration / 5 + 1;
+
+                for (int i = 0; i < slotsNeeded && slotIndex < script.length; i++) {
                     script[slotIndex] = c.toString();
                     slotIndex++;
                 }
+                contestantIdx++;
+            } else {
+                // 3. No more contestants and no pause scheduled yet? 
+                // Fill with empty space/break until the next pause or end
+                script[slotIndex] = "Empty Slot / Free Time";
+                slotIndex++;
             }
         }
     }
 
 
+    private void addPause() {
+        if (slotIndex < script.length) {
+            for (int i = 0; i < songOrder.submissions.pauses.get(pausesUsed).duration; i += 5) {
+                script[slotIndex] = songOrder.submissions.pauses.get(pausesUsed).toString();
+                slotIndex++;
+            }
+            pausesUsed++;
+        }
+    }
 
 
+    private boolean pausePlanner() {
+        if (pausesUsed >= pauseCount) return false;
+
+        // Calculate when the NEXT pause should happen
+        // We add startTime0 because timeStamps start from 0 (preparation)
+        int nextPauseMilestone = timing.startTime0 + (timing.duration * (pausesUsed + 1) / (pauseCount + 1));
+
+        // If the current slot has reached or passed the milestone, trigger pause
+        return timeStamps[slotIndex] >= nextPauseMilestone;
+    }
 
 
 

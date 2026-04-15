@@ -15,7 +15,7 @@ public class StandStructure {
     private int beredingTime;
     private int endTime;
     private int currentTime;
-    private int duration;
+    public int duration;
     private int beredingTime0;
     public int startTime0;
     private int endTime0;
