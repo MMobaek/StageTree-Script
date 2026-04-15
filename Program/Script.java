@@ -1,4 +1,7 @@
 import java.util.ArrayList;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.PrintWriter;
 
 public class Script {
     private StandStructure timing;
@@ -23,6 +26,7 @@ public class Script {
         this.slotIndex = 0;
         addPreparation();
         addPerformances();
+        exportToCSV();
     } 
 
     private void addPreparation() {
@@ -107,6 +111,32 @@ public class Script {
         }
         return agenda;
     }
+
+    public void exportToCSV() {
+        String filename = "StageTreeScript.csv";
+        try (PrintWriter writer = new PrintWriter(new FileWriter(filename))) {
+            // Optional: Add a header row
+            writer.println("Time,Activity");
+
+            for (int i = 0; i < script.length; i++) {
+                // Calculate the time exactly as you do in your toString()
+                int currentTotalMinutes = timeStamps[i] + (timing.startTime - timing.startTime0);
+                String timeStr = String.format("%02d:%02d", 
+                    timing.minutesToDatehour(currentTotalMinutes), 
+                    timing.minutesToDateminute(currentTotalMinutes));
+
+                // Clean the script content: handle nulls and escape double quotes
+                String content = (script[i] == null) ? "" : script[i].replace("\"", "\"\"");
+
+                // Write as "Time","Activity Content"
+                writer.println(String.format("%s,\"%s\"", timeStr, content));
+            }
+            System.out.println("CSV exported successfully to: " + filename);
+        } catch (IOException e) {
+            System.err.println("Error writing to CSV: " + e.getMessage());
+        }
+    }
+
 
 
     @Override
