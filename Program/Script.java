@@ -26,13 +26,31 @@ public class Script {
     } 
 
     private void addPreparation() {
-        for (int i = 0; i < timeStamps.length; i++) {
-            if (timeStamps[i] < timing.startTime0) {
-                script[i] = "Preparation for consert";
+        while (slotIndex < timeStamps.length && timeStamps[slotIndex] < timing.startTime0) {
+            Stageprep foundPrep = null;
+            int currentClockTime = timeStamps[slotIndex] + timing.beredingTime; 
+
+            for (Stageprep s : songOrder.submissions.stageprep) {
+                if (s.time == currentClockTime) {
+                    foundPrep = s;
+                    break;
+                }
+            }
+
+            if (foundPrep != null) {
+                int slotsNeeded = foundPrep.duration / 5 + 1;
+                for (int j = 0; j < slotsNeeded && slotIndex < script.length; j++) {
+                    script[slotIndex] = foundPrep.toString();
+                    slotIndex++;
+                }
+            } else {
+                script[slotIndex] = "Other preparation for concert";
                 slotIndex++;
             }
         }
     }
+
+
 
     private void addPerformances() {
         int contestantIdx = 0;
@@ -54,9 +72,7 @@ public class Script {
                 }
                 contestantIdx++;
             } else {
-                // 3. No more contestants and no pause scheduled yet? 
-                // Fill with empty space/break until the next pause or end
-                script[slotIndex] = "Empty Slot / Free Time";
+                script[slotIndex] = "Empty Slot";
                 slotIndex++;
             }
         }
@@ -78,13 +94,11 @@ public class Script {
         if (pausesUsed >= pauseCount) return false;
 
         // Calculate when the NEXT pause should happen
-        // We add startTime0 because timeStamps start from 0 (preparation)
         int nextPauseMilestone = timing.startTime0 + (timing.duration * (pausesUsed + 1) / (pauseCount + 1));
 
         // If the current slot has reached or passed the milestone, trigger pause
         return timeStamps[slotIndex] >= nextPauseMilestone;
     }
-
 
 
     @Override

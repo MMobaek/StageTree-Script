@@ -8,9 +8,8 @@ public class Main {
         // Pause pause2 = new Pause(10, "The second break");
         // submissions.addPause(pause2);
 
-        System.out.print(submissions.toString());
-        //StandStructure organization = new StandStructure(15, 4, 18, 30, 22, 15, 11, 30);
-
+        // Stageprep fixSound = new Stageprep(20, 16, 45, "Fix sound for elguitar etc...");
+        // submissions.addPreparation(fixSound);
 
         // Contestant Jimmy = new Contestant("Jimmy", "Ordinary", "song", 7, -10);
         // submissions.addSubmission(Jimmy);
@@ -28,6 +27,8 @@ public class Main {
         // submissions.addSubmission(Leo);
         // submissions.removeSubmission("Kim");
 
+
+        System.out.println(submissions.toString());
         Script script = new Script(15, 18, 30, 22, 15, 11, 30, submissions);
         submissions.Writer();
         System.out.println(script.toString());

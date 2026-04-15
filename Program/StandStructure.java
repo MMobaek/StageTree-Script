@@ -12,7 +12,7 @@ public class StandStructure {
     private int endHour;
     private int endMinute;
     public int startTime;
-    private int beredingTime;
+    public int beredingTime;
     private int endTime;
     private int currentTime;
     public int duration;

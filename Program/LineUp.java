@@ -4,7 +4,8 @@ import java.util.ArrayList;
 public class LineUp {
     private String FILENAME = "submissionList.ser";
     public ArrayList<Contestant> stagePool;
-    public ArrayList<Pause> pauses; // Kept name as is
+    public ArrayList<Pause> pauses;
+    public ArrayList<Stageprep> stageprep;
 
     public LineUp() {
         // Load existing data; loadList now initializes both lists
@@ -32,8 +33,8 @@ public class LineUp {
         saveList();
     }
 
-    public void popPause() {
-        pauses.remove(pauses.size());
+    public void popPause(int index) {
+        pauses.remove(index);
         saveList();
     }
 
@@ -47,12 +48,33 @@ public class LineUp {
         }
     }
 
+    public void addPreparation(Stageprep prep) {
+        stageprep.add(prep);
+        saveList();
+    }
+
+    public void popPreparation(int index) {
+        stageprep.remove(index);
+        saveList();
+    }
+
+    public void removePreparation(String description) {
+        for (int i = 0; i < stageprep.size(); i++) {
+            if (stageprep.get(i).description.equals(description)) {
+                stageprep.remove(i);
+                saveList();
+                break;
+            }
+        }
+    }
+
     public void saveList() {
         duplicantRemover();
         try (ObjectOutputStream oos = new ObjectOutputStream(new FileOutputStream(FILENAME))) {
             // Save both objects in order
             oos.writeObject(stagePool);
             oos.writeObject(pauses);
+            oos.writeObject(stageprep);
             System.out.println("Data saved successfully to " + FILENAME);
         } catch (IOException e) {
             System.err.println("Error saving list: " + e.getMessage());
@@ -65,16 +87,19 @@ public class LineUp {
         if (!file.exists()) {
             this.stagePool = new ArrayList<>();
             this.pauses = new ArrayList<>();
+            this.stageprep = new ArrayList<>();
             return;
         }
 
         try (ObjectInputStream ois = new ObjectInputStream(new FileInputStream(FILENAME))) {
             this.stagePool = (ArrayList<Contestant>) ois.readObject();
             this.pauses = (ArrayList<Pause>) ois.readObject();
+            this.stageprep = (ArrayList<Stageprep>) ois.readObject();
         } catch (IOException | ClassNotFoundException e) {
             System.err.println("Error loading list: " + e.getMessage());
             this.stagePool = new ArrayList<>();
             this.pauses = new ArrayList<>();
+            this.stageprep = new ArrayList<>();
         }
     }
 
@@ -94,6 +119,6 @@ public class LineUp {
     }
 
     public String toString() {
-        return String.format("Submissions: %d\nPauses: %d\n", stagePool.size(), pauses.size());
+        return String.format("Submissions: %d\nPauses: %d\nPreperation tasks:%d", stagePool.size(), pauses.size(), stageprep.size());
     }
 }
