@@ -1,13 +1,14 @@
 import javax.swing.*;
 import java.awt.*;
+import java.util.List;
 
 public class ScriptDisplay extends JFrame {
     private JTextArea textArea;
     private Script script;
     private LineUp submissions;
-    // Store timing parameters to recreate the script object
-    private int[] timingParams; 
+    private int[] timingParams;
     private ScheduleCleaner cleaning;
+    private TimelinePanel timelinePanel; // New timeline component
 
     public ScriptDisplay(Script script, LineUp submissions, int[] timingParams) {
         this.script = script;
@@ -16,20 +17,21 @@ public class ScriptDisplay extends JFrame {
         this.cleaning = new ScheduleCleaner();
 
         setTitle("Event Script Manager");
-        setSize(700, 600);
+        setSize(750, 700);
         setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-        setLocationRelativeTo(null);
 
-        // --- Script Display Area ---
         textArea = new JTextArea();
         textArea.setText(cleaning.makeNeat(script.toString()));
         textArea.setEditable(false);
         textArea.setFont(new Font("Monospaced", Font.PLAIN, 12));
         JScrollPane scrollPane = new JScrollPane(textArea);
+        scrollPane.setPreferredSize(new Dimension(750, 400));
 
-                // --- Button Panel ---
-        JPanel buttonPanel = new JPanel(new GridLayout(2, 3, 5, 5)); 
-
+        // --- Timeline Setup ---
+        timelinePanel = new TimelinePanel();
+        
+        // --- Button Panel ---
+        JPanel buttonPanel = new JPanel(new GridLayout(2, 3, 5, 5));
         JButton btnContestant = new JButton("Add Contestant");
         JButton btnPause = new JButton("Add Pause");
         JButton btnPrep = new JButton("Add Stageprep");
@@ -37,7 +39,7 @@ public class ScriptDisplay extends JFrame {
         JButton btnRemPause = new JButton("Remove Pause");
         JButton btnRemPrep = new JButton("Remove Prep");
 
-        // ADD THESE ACTION LISTENERS:
+        // Action Listeners
         btnContestant.addActionListener(e -> showContestantDialog());
         btnPause.addActionListener(e -> showPauseDialog());
         btnPrep.addActionListener(e -> showPrepDialog());
@@ -45,7 +47,6 @@ public class ScriptDisplay extends JFrame {
         btnRemPause.addActionListener(e -> showRemovePauseDialog());
         btnRemPrep.addActionListener(e -> showRemovePrepDialog());
 
-        // Add them to the grid
         buttonPanel.add(btnContestant);
         buttonPanel.add(btnPause);
         buttonPanel.add(btnPrep);
@@ -53,33 +54,71 @@ public class ScriptDisplay extends JFrame {
         buttonPanel.add(btnRemPause);
         buttonPanel.add(btnRemPrep);
 
+        // --- Combined Bottom Layout ---
+        JPanel bottomContainer = new JPanel(new BorderLayout());
+        bottomContainer.add(timelinePanel, BorderLayout.NORTH); // Timeline above buttons
+        bottomContainer.add(buttonPanel, BorderLayout.CENTER);
 
-        // Layout the main frame
         add(scrollPane, BorderLayout.CENTER);
-        add(buttonPanel, BorderLayout.SOUTH);
+        add(bottomContainer, BorderLayout.SOUTH);
 
-        // 1. Force the scroll pane to a specific size (Width, Height)
-        // This keeps the window height under control while allowing scrolling
-        scrollPane.setPreferredSize(new Dimension(750, 600));
-
-        // 2. pack() now respects the scrollPane's preferred size 
-        // and the button panel's width
-        this.pack(); 
-
-        // 3. Center it
+        this.pack();
         this.setLocationRelativeTo(null);
     }
 
+    // Custom Panel to draw the timeline
+    private class TimelinePanel extends JPanel {
+        public TimelinePanel() {
+            setPreferredSize(new Dimension(700, 40)); // Fixed height for the bar
+            setBorder(BorderFactory.createTitledBorder("Visual Schedule"));
+        }
+
+        @Override
+        protected void paintComponent(Graphics g) {
+            super.paintComponent(g);
+            // Get the list of segments from your Script object
+            // Assuming script.getSegments() returns a List of objects representing the rows
+            List<?> segments = script.getSegments(); 
+            if (segments == null || segments.isEmpty()) return;
+
+            int w = getWidth() - 20;
+            int h = getHeight() - 25;
+            int x = 10;
+            int y = 20;
+
+            double segmentWidth = (double) w / segments.size();
+
+            for (int i = 0; i < segments.size(); i++) {
+                String desc = segments.get(i).toString();
+                
+                // Color Logic
+                if (desc.contains("Empty Slot") || desc.contains("Other preparation for concert")) {
+                    g.setColor(new Color(255, 100, 100)); // Light Red
+                } else {
+                    g.setColor(new Color(100, 255, 100)); // Light Green
+                }
+
+                int drawX = x + (int)(i * segmentWidth);
+                int drawW = (int)segmentWidth;
+                
+                g.fillRect(drawX, y, drawW, h);
+                g.setColor(Color.BLACK);
+                g.drawRect(drawX, y, drawW, h); // Outline
+            }
+        }
+    }
 
     private void refreshScript() {
-        // Re-create the script with updated submissions
         this.script = new Script(timingParams[0], timingParams[1], timingParams[2], 
                                  timingParams[3], timingParams[4], timingParams[5], 
                                  timingParams[6], submissions);
         textArea.setText(cleaning.makeNeat(script.toString()));
+        timelinePanel.repaint(); // Redraw the timeline when data changes
     }
 
-    private void showContestantDialog() {
+    // ... Keep all your existing showDialog methods here ...
+
+        private void showContestantDialog() {
         JTextField name = new JTextField();
         JTextField song = new JTextField();
         JTextField cat = new JTextField();
@@ -129,57 +168,56 @@ public class ScriptDisplay extends JFrame {
     }
 
     private void showRemoveContestantDialog() {
-    String name = JOptionPane.showInputDialog(this, "Enter Contestant Name to remove:");
-    if (name != null && !name.isEmpty()) {
-        submissions.removeSubmission(name);
-        refreshScript();
-    }
-}
-
-private void showRemovePauseDialog() {
-    String[] options = {"Index", "Description"};
-    JComboBox<String> combo = new JComboBox<>(options);
-    JTextField input = new JTextField();
-
-    Object[] message = { "Remove by:", combo, "Value:", input };
-
-    int option = JOptionPane.showConfirmDialog(this, message, "Remove Pause", JOptionPane.OK_CANCEL_OPTION);
-    if (option == JOptionPane.OK_OPTION) {
-        if (combo.getSelectedIndex() == 0) { // Index
-            try {
-                submissions.popPause(Integer.parseInt(input.getText()));
-            } catch (NumberFormatException | IndexOutOfBoundsException ex) {
-                JOptionPane.showMessageDialog(this, "Invalid Index");
-            }
-        } else { // Description
-            submissions.removePause(input.getText());
+        String name = JOptionPane.showInputDialog(this, "Enter Contestant Name to remove:");
+        if (name != null && !name.isEmpty()) {
+            submissions.removeSubmission(name);
+            refreshScript();
         }
-        refreshScript();
     }
-}
 
-private void showRemovePrepDialog() {
-    String[] options = {"Index", "Description"};
-    JComboBox<String> combo = new JComboBox<>(options);
-    JTextField input = new JTextField();
+    private void showRemovePauseDialog() {
+        String[] options = {"Index", "Description"};
+        JComboBox<String> combo = new JComboBox<>(options);
+        JTextField input = new JTextField();
 
-    Object[] message = { "Remove by:", combo, "Value:", input };
+        Object[] message = { "Remove by:", combo, "Value:", input };
 
-    int option = JOptionPane.showConfirmDialog(this, message, "Remove Preparation", JOptionPane.OK_CANCEL_OPTION);
-    if (option == JOptionPane.OK_OPTION) {
-        if (combo.getSelectedIndex() == 0) { // Index
-            try {
-                submissions.popPreparation(Integer.parseInt(input.getText()));
-            } catch (NumberFormatException | IndexOutOfBoundsException ex) {
-                JOptionPane.showMessageDialog(this, "Invalid Index");
+        int option = JOptionPane.showConfirmDialog(this, message, "Remove Pause", JOptionPane.OK_CANCEL_OPTION);
+        if (option == JOptionPane.OK_OPTION) {
+            if (combo.getSelectedIndex() == 0) { // Index
+                try {
+                    submissions.popPause(Integer.parseInt(input.getText()));
+                } catch (NumberFormatException | IndexOutOfBoundsException ex) {
+                    JOptionPane.showMessageDialog(this, "Invalid Index");
+                }
+            } else { // Description
+                submissions.removePause(input.getText());
             }
-        } else { // Description
-            submissions.removePreparation(input.getText());
+            refreshScript();
         }
-        refreshScript();
     }
-}
 
+    private void showRemovePrepDialog() {
+        String[] options = {"Index", "Description"};
+        JComboBox<String> combo = new JComboBox<>(options);
+        JTextField input = new JTextField();
+
+        Object[] message = { "Remove by:", combo, "Value:", input };
+
+        int option = JOptionPane.showConfirmDialog(this, message, "Remove Preparation", JOptionPane.OK_CANCEL_OPTION);
+        if (option == JOptionPane.OK_OPTION) {
+            if (combo.getSelectedIndex() == 0) { // Index
+                try {
+                    submissions.popPreparation(Integer.parseInt(input.getText()));
+                } catch (NumberFormatException | IndexOutOfBoundsException ex) {
+                    JOptionPane.showMessageDialog(this, "Invalid Index");
+                }
+            } else { // Description
+                submissions.removePreparation(input.getText());
+            }
+            refreshScript();
+        }
+    }
     public static void showScript(Script script, LineUp submissions, int[] params) {
         SwingUtilities.invokeLater(() -> new ScriptDisplay(script, submissions, params).setVisible(true));
     }

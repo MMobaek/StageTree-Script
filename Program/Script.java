@@ -100,6 +100,14 @@ public class Script {
         return timeStamps[slotIndex] >= nextPauseMilestone;
     }
 
+    public ArrayList<String> getSegments () {
+        ArrayList<String> agenda = new ArrayList<>();
+        for (String s : script) {
+            agenda.add(s);
+        }
+        return agenda;
+    }
+
 
     @Override
     public String toString() {
