@@ -8,7 +8,9 @@ public class ScriptDisplay extends JFrame {
     private LineUp submissions;
     private int[] timingParams;
     private ScheduleCleaner cleaning;
-    private TimelinePanel timelinePanel; // New timeline component
+    private TimelinePanel timelinePanel; 
+    private boolean isNeat = true; 
+
 
     public ScriptDisplay(Script script, LineUp submissions, int[] timingParams) {
         this.script = script;
@@ -31,13 +33,18 @@ public class ScriptDisplay extends JFrame {
         timelinePanel = new TimelinePanel();
         
         // --- Button Panel ---
-        JPanel buttonPanel = new JPanel(new GridLayout(2, 3, 5, 5));
+        JPanel buttonPanel = new JPanel(new GridLayout(3, 3, 5, 5));
         JButton btnContestant = new JButton("Add Contestant");
         JButton btnPause = new JButton("Add Pause");
         JButton btnPrep = new JButton("Add Stageprep");
         JButton btnRemContestant = new JButton("Remove Contestant");
         JButton btnRemPause = new JButton("Remove Pause");
         JButton btnRemPrep = new JButton("Remove Prep");
+        JButton btnToggle = new JButton("Toggle Neat View");
+        btnToggle.addActionListener(e -> {
+            isNeat = !isNeat; // Flip the state
+            refreshScript();  // Refresh the display
+        });
 
         // Action Listeners
         btnContestant.addActionListener(e -> showContestantDialog());
@@ -53,6 +60,7 @@ public class ScriptDisplay extends JFrame {
         buttonPanel.add(btnRemContestant);
         buttonPanel.add(btnRemPause);
         buttonPanel.add(btnRemPrep);
+        buttonPanel.add(btnToggle);
 
         // --- Combined Bottom Layout ---
         JPanel bottomContainer = new JPanel(new BorderLayout());
@@ -110,11 +118,16 @@ public class ScriptDisplay extends JFrame {
 
     private void refreshScript() {
         this.script = new Script(timingParams[0], timingParams[1], timingParams[2], 
-                                 timingParams[3], timingParams[4], timingParams[5], 
-                                 timingParams[6], submissions);
-        textArea.setText(cleaning.makeNeat(script.toString()));
-        timelinePanel.repaint(); // Redraw the timeline when data changes
+                                timingParams[3], timingParams[4], timingParams[5], 
+                                timingParams[6], submissions);
+        
+        // Toggle logic
+        String content = isNeat ? cleaning.makeNeat(script.toString()) : script.toString();
+        textArea.setText(content);
+        
+        timelinePanel.repaint();
     }
+
 
     // ... Keep all your existing showDialog methods here ...
 
