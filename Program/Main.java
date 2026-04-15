@@ -32,5 +32,12 @@ public class Main {
         Script script = new Script(15, 18, 30, 22, 15, 11, 30, submissions);
         submissions.Writer();
         System.out.println(script.toString());
+
+        // ... setup your submissions and stand structure ...
+        Script myScript = new Script(15, 18, 30, 22, 15, 11, 30, submissions);;
+
+        // Launch the UI
+        ScriptDisplay.showScript(myScript);
+
     }
 }
