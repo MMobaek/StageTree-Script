@@ -116,6 +116,7 @@ public class Script {
         String filename = "StageTreeScript.csv";
         try (PrintWriter writer = new PrintWriter(new FileWriter(filename))) {
             // Optional: Add a header row
+            writer.println("Note:,\"A prettier representation of the program is available at https://github.com/MMobaek/StageTree-Script.git -> code -> download zip -> extract -> Program -> StageTree-Script.jar\"");
             writer.println("Time,Activity");
 
             for (int i = 0; i < script.length; i++) {

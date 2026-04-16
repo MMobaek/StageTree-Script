@@ -1,1 +1,3 @@
-# StageTree-Script
+To download this program, click the big green button that says 'code'. At the bottom of this menu, click 'download ZIP'. After you have downloaded it, extract the zip file. To run the program navigate to Program -> StageTree-Script.jar. If this doesn't run the script, it is likely you need to install java on your computer. 
+
+When you have run the program, you will be able to see the script, and you can toggle between two reading modes for better readablity. If you make changes to the program, it doesn't magically appear on the computer of everyone else who has the program. You must go to github, and replace the submissionList.ser file in the Program folder with your submissionList.ser file. Then you must make a pull request, which I'll accept.
